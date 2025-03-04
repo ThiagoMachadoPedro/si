@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela com Imagem e Formulário</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .image-container {
+            width: 80%;
+            background: url('https://th.bing.com/th/id/R.e74e83e1b2ade19ea2e0f9428ba3186a?rik=O8VZ6OrQlulcFw&riu=http%3a%2f%2fwww.amarno.com.br%2fnovo%2fconteudo%2fobras%2f4.jpg&ehk=79xwJOYbDTlNOT6fiolZbXtdf4ofq%2fIw02aVnYZVbXo%3d&risl=&pid=ImgRaw&r=0') no-repeat center center;
+            background-size: cover;
+            position: relative;
+        }
+        .form-container {
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+        form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input {
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .name-list {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .draggable {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            cursor: grab;
+            text-align: center;
+            position: absolute;
+        }
+        .draggable img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+        .draggable:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container" id="image-container"></div>
+    <div class="form-container">
+        <form id="name-form">
+            <label for="name">Nome:</label>
+            <input type="text" id="name" name="name" required>
+            <button type="submit">Enviar</button>
+        </form>
+        <div class="name-list" id="name-list"></div>
+    </div>
+
+    <script>
+        document.getElementById('name-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            addName();
+        });
+
+        document.getElementById('name').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addName();
+            }
+        });
+
+        function addName() {
+            const nameInput = document.getElementById('name');
+            const nameValue = nameInput.value.trim();
+            if (nameValue) {
+                const nameElement = document.createElement('div');
+                nameElement.classList.add('draggable');
+                nameElement.draggable = true;
+                nameElement.innerHTML = `<img src='seguranca.apng' alt='Ícone'> <span>${nameValue}</span>`;
+                nameElement.id = 'name-' + Date.now();
+                nameElement.addEventListener('dragstart', function(event) {
+                    event.dataTransfer.setData('text/plain', nameElement.id);
+                });
+                document.getElementById('name-list').appendChild(nameElement);
+                nameInput.value = '';
+            }
+        }
+
+        document.getElementById('image-container').addEventListener('dragover', function(event) {
+            event.preventDefault();
+        });
+
+        document.getElementById('image-container').addEventListener('drop', function(event) {
+            event.preventDefault();
+            const nameId = event.dataTransfer.getData('text/plain');
+            const droppedElement = document.getElementById(nameId);
+            if (droppedElement) {
+                droppedElement.style.position = 'absolute';
+                droppedElement.style.left = event.clientX - this.getBoundingClientRect().left + 'px';
+                droppedElement.style.top = event.clientY - this.getBoundingClientRect().top + 'px';
+                this.appendChild(droppedElement);
+                if (document.getElementById('name-list').contains(droppedElement)) {
+                    document.getElementById('name-list').removeChild(droppedElement);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
